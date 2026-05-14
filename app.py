@@ -15,7 +15,7 @@ def get_base64(file_path):
 logo_base64 = get_base64("Logo white PNG.png")
 
 # --- CONFIGURATION ---
-st.set_page_config(page_title="Sanj AI Analyst | Real Estate Intel", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Sanj Price Projector | Real Estate Intel", layout="wide", initial_sidebar_state="collapsed")
 
 # --- PREMIUM DARK THEME CSS ---
 st.markdown("""
