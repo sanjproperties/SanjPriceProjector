@@ -9,21 +9,22 @@ from datetime import datetime
 st.set_page_config(page_title="Sanj Properties | AI Price Projector V4", layout="wide", initial_sidebar_state="collapsed")
 
 # Custom CSS for V3 Style Dark Theme
+# Custom CSS for V3 Style Dark Theme
 st.markdown(f"""
     <style>
-    .main { background-color: #0e1117; color: white; font-family: 'Inter', sans-serif; }
-    .stTextInput>div>div>input, .stNumberInput>div>div>input {
+    .main {{ background-color: #0e1117; color: white; font-family: 'Inter', sans-serif; }}
+    .stTextInput>div>div>input, .stNumberInput>div>div>input {{
         background-color: #1e2130 !important; color: white !important; border: 1px solid #3d4455 !important; border-radius: 8px;
-    }
-    .stButton>button {
+    }}
+    .stButton>button {{
         background: linear-gradient(90deg, #ff4b4b 0%, #ff7575 100%);
         color: white; font-weight: bold; width: 100%; border: none; border-radius: 12px; height: 50px; transition: 0.3s;
-    }
-    .stButton>button:hover { transform: scale(1.02); box-shadow: 0 4px 15px rgba(255, 75, 75, 0.4); }
-    .project-card {
+    }}
+    .stButton>button:hover {{ transform: scale(1.02); box-shadow: 0 4px 15px rgba(255, 75, 75, 0.4); }}
+    .project-card {{
         background: #1e2130; border-left: 5px solid #ff4b4b; padding: 20px; border-radius: 10px; margin-bottom: 20px;
-    }
-    .footer { text-align: center; color: #888; font-size: 14px; margin-top: 50px; border-top: 1px solid #333; padding-top: 20px; }
+    }}
+    .footer {{ text-align: center; color: #888; font-size: 14px; margin-top: 50px; border-top: 1px solid #333; padding-top: 20px; }}
     </style>
 """, unsafe_allow_html=True)
 
