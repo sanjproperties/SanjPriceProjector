@@ -2,6 +2,17 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import streamlit.components.v1 as components
+import base64
+import os
+
+# --- LOGO PROCESSING ---
+# We use the local file if available, otherwise fallback to GitHub raw URL
+logo_path = 'image_69be75.png'
+logo_base64 = ""
+
+if os.path.exists(logo_path):
+    with open(logo_path, "rb") as f:
+        logo_base64 = base64.b64encode(f.read()).decode()
 
 # --- CONFIGURATION ---
 st.set_page_config(page_title="Sanj AI Analyst | Real Estate Intel", layout="wide", initial_sidebar_state="collapsed")
@@ -64,8 +75,17 @@ def get_analyst_intel(location):
         }
 
 # --- BRANDING & HEADER ---
-st.markdown("<div style='text-align: center; color: #ff4b4b; font-weight: 800; font-size: 14px; letter-spacing: 2px;'>SANJ PROPERTIES — WHERE VISION MEETS VELOCITY</div>", unsafe_allow_html=True)
-st.markdown("<h1 style='text-align: center; margin-bottom: 40px;'>Sanj AI Analyst</h1>", unsafe_allow_html=True)
+col_logo, col_title = st.columns([1, 4])
+with col_logo:
+    if logo_base64:
+        st.image(f"data:image/png;base64,{logo_base64}", width=120)
+    else:
+        # Fallback to your GitHub URL
+        st.image("https://raw.githubusercontent.com/charchitrawal/sanj_logo/main/Sanj_Properties_Logo.png", width=120)
+
+with col_title:
+    st.markdown("<div style='color: #ff4b4b; font-weight: 800; font-size: 14px; letter-spacing: 2px; padding-top: 10px;'>SANJ PROPERTIES — WHERE VISION MEETS VELOCITY</div>", unsafe_allow_html=True)
+    st.markdown("<h1 style='margin-bottom: 40px;'>Sanj AI Analyst</h1>", unsafe_allow_html=True)
 
 # --- INPUT SECTION ---
 with st.container():
@@ -82,74 +102,4 @@ if analyze:
 
     # 1. Name Display
     st.markdown(f"<h1 style='font-size: 65px; font-weight: 900; margin-bottom: 0; color: white;'>{loc_input.upper()}</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#8b949e; margin-top:-10px; font-weight: 600;'>INDORE REAL ESTATE • AI-POWERED INVESTMENT INSIGHTS</p>", unsafe_allow_html=True)
-
-    # 2. Latest News & Key Drivers
-    st.write("---")
-    col_news, col_factors = st.columns(2)
-    with col_news:
-        st.markdown("### 📰 Latest Market News")
-        for n in intel['news']:
-            st.markdown(f"<div class='news-card'>{n}</div>", unsafe_allow_html=True)
-    with col_factors:
-        st.markdown("### 🚀 Key Growth Drivers")
-        st.info(intel['drivers'])
-
-    # 3-5. Metrics Display
-    m1, m2, m3, m4 = st.columns(4)
-    with m1:
-        st.markdown(f"<div class='metric-card'><div class='score-circle'>{intel['score']}</div><div style='background:#ff4b4b; border-radius:20px; font-size:12px; font-weight:800; padding:4px 12px;'>{intel['action']}</div><div class='metric-label' style='margin-top:10px;'>Investment Score</div></div>", unsafe_allow_html=True)
-    with m2:
-        st.markdown(f"<div class='metric-card'><div class='metric-value'>{int(intel['appr']*100)}%</div><div class='metric-label'>Past 5Y Appr.</div><br><div class='metric-value'>{int(intel['gain']*100)}%</div><div class='metric-label'>Next 5Y Proj.</div></div>", unsafe_allow_html=True)
-    with m3:
-        st.markdown(f"<div class='metric-card'><div class='metric-value'>{intel['yield']}</div><div class='metric-label'>Rental Yield</div><br><div class='metric-value'>Very High</div><div class='metric-label'>Market Liquidity</div></div>", unsafe_allow_html=True)
-    with m4:
-        st.markdown(f"<div class='metric-card'><div class='metric-label'>2031 Est. Value</div><div class='est-value'>₹{est_val:,}</div><div class='metric-label' style='color:#00ff88; font-weight:700;'>Target Price / Sqft</div></div>", unsafe_allow_html=True)
-
-    # 6-7. Interactive Charts
-    st.markdown("<br>", unsafe_allow_html=True)
-    ch1, ch2 = st.columns(2)
-    with ch1:
-        st.markdown("### 📊 Price History")
-        fig_h = go.Figure(go.Scatter(x=list(range(2021, 2027)), y=[price/2, price/1.7, price/1.4, price/1.2, price/1.1, price], mode='lines+markers', line=dict(color='#ff4b4b', width=4), fill='tozeroy', fillcolor='rgba(255, 75, 75, 0.1)'))
-        fig_h.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white", height=300)
-        st.plotly_chart(fig_h, use_container_width=True)
-    with ch2:
-        st.markdown("### 📈 Projection")
-        fig_p = go.Figure(go.Scatter(x=list(range(2026, 2032)), y=[price, price*1.2, price*1.5, price*1.8, price*2.1, est_val], mode='lines+markers', line=dict(color='#00ff88', width=4), fill='tozeroy', fillcolor='rgba(0, 255, 136, 0.1)'))
-        fig_p.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white", height=300)
-        st.plotly_chart(fig_p, use_container_width=True)
-
-    # 8-10. Development Progress & Detailed Verdict
-    st.write("---")
-    v_left, v_right = st.columns([2, 1])
-    with v_left:
-        st.markdown("### 🛠 Development Factors (%)")
-        factors = [("Infrastructure", intel['infra']), ("Commercial", intel['comm']), ("Connectivity", intel['conn']), ("Government", intel['govt'])]
-        for lab, val in factors:
-            st.markdown(f"<div style='display:flex; justify-content:space-between; font-size:13px;'><span>{lab}</span><span>{val}%</span></div><div class='progress-bg'><div class='progress-fill' style='width:{val}%'></div></div>", unsafe_allow_html=True)
-    with v_right:
-        st.markdown(f"<div style='background:rgba(0,255,136,0.05); border:1px solid #00ff88; padding:20px; border-radius:12px;'><h3>AI Verdict</h3><p>{intel['verdict']}</p></div>", unsafe_allow_html=True)
-
-    # 12. PRICE TIMELINE TABLE
-    st.markdown("### 📅 Detailed Price Timeline")
-    rows = ""
-    for y in range(2021, 2032):
-        p_val = price / (1 + (intel['appr'] * (2026 - y) / 5)) if y < 2026 else price * (1 + (intel['gain'] * (y - 2026) / 5))
-        status = "Historical" if y < 2026 else "CURRENT" if y == 2026 else "Projected"
-        rows += f"<tr><td>{y}</td><td>₹{int(p_val):,}</td><td style='color:{'#00ff88' if 'Projected' in status else '#ff4b4b'};'>{status}</td></tr>"
-    st.markdown(f"<table><tr><th>YEAR</th><th>PRICE / SQFT</th><th>STATUS</th></tr>{rows}</table>", unsafe_allow_html=True)
-
-# --- FOOTER & WHATSAPP ---
-st.markdown(f"""
-    <div style='text-align:center; padding:60px; border-top:1px solid #30363d; margin-top:80px; background:#161b22; border-radius:12px;'>
-        <h3 style='color:#ff4b4b;'>Sanj Properties — Where Vision Meets Velocity</h3>
-        <p>Expert Advice: 9039914137 | 7697246823</p>
-        <a href='https://wa.me/919039914137' class='whatsapp-btn'>CHAT ON WHATSAPP ↗</a>
-        <p style='font-size:12px; margin-top:30px; color:#8b949e;'>
-            <a href='https://linktr.ee/Sanj.properties' style='color:#8b949e;'>Our Curated Portfolio</a> | 
-            <a href='https://www.instagram.com/sanj.property/' style='color:#8b949e;'>Instagram</a> | 
-            <a href='https://www.facebook.com/profile.id=61586657172896' style='color:#8b949e;'>Facebook</a>
-        </p>
-    </div>
-""", unsafe_allow_html=True)
+    st.markdown("<p style='color:#8b949e; margin-top:-10px;
