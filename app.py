@@ -1,105 +1,119 @@
 import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
-import streamlit.components.v1 as components
 import base64
 import os
 
 # --- LOGO PROCESSING ---
-# We use the local file if available, otherwise fallback to GitHub raw URL
-logo_path = 'image_69be75.png'
-logo_base64 = ""
+# This converts your uploaded PNG to a format Streamlit can render directly
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
 
+# Using the filename of the uploaded PNG logo
+logo_path = 'image_69ae98.png' 
+logo_html = ""
 if os.path.exists(logo_path):
-    with open(logo_path, "rb") as f:
-        logo_base64 = base64.b64encode(f.read()).decode()
+    bin_str = get_base64_of_bin_file(logo_path)
+    logo_html = f"data:image/png;base64,{bin_str}"
 
 # --- CONFIGURATION ---
-st.set_page_config(page_title="Sanj AI Analyst | Real Estate Intel", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Sanj Properties | AI Analyst", layout="wide", initial_sidebar_state="collapsed")
 
-# --- PREMIUM DARK THEME CSS ---
+# Custom CSS for the "Senior Analyst" Premium Dark Theme
 st.markdown("""
     <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap');
-    .main { background-color: #0d1117; color: #ffffff; font-family: 'Inter', sans-serif; }
-    .metric-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px; text-align: center; }
-    .est-value { color: #00ff88; font-size: 42px; font-weight: 900; line-height: 1; }
-    .score-circle { width: 100px; height: 100px; border-radius: 50%; border: 4px solid #ff4b4b; display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 28px; font-weight: 900; color: #ff4b4b; background: rgba(255, 75, 75, 0.05); }
-    .news-card { background: #161b22; border-left: 4px solid #ff4b4b; border-radius: 8px; padding: 15px; margin-bottom: 12px; border: 1px solid #30363d; font-size: 14px; }
-    .whatsapp-btn { background: #25d366; color: white !important; padding: 15px 30px; border-radius: 30px; text-decoration: none; font-weight: 800; display: inline-block; margin: 10px 0; border: none; text-align: center; }
-    .progress-fill { background: #00ff88; height: 8px; border-radius: 10px; }
-    .progress-bg { background: #30363d; border-radius: 10px; height: 8px; margin-bottom: 15px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; color: white; background: #161b22; border-radius: 12px; overflow: hidden; }
-    th { text-align: left; color: #8b949e; font-size: 12px; padding: 15px; border-bottom: 1px solid #30363d; background: #0d1117; }
-    td { padding: 15px; border-bottom: 1px solid #0d1117; }
-    iframe { border-radius: 12px; border: 1px solid #30363d; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+    
+    .main { background-color: #0e1117; color: #ffffff; font-family: 'Inter', sans-serif; }
+    [data-testid="stHeader"] { background: rgba(0,0,0,0); }
+    
+    .stTextInput>div>div>input { background-color: #161b22 !important; color: white !important; border: 1px solid #30363d !important; border-radius: 8px; }
+    .stButton>button {
+        background: linear-gradient(90deg, #ff4b4b 0%, #ff7575 100%);
+        color: white; font-weight: 800; width: 100%; border: none; border-radius: 12px; height: 50px;
+    }
+    
+    .metric-card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 15px; text-align: center; }
+    .metric-value { color: #ff4b4b; font-size: 24px; font-weight: 800; }
+    .metric-label { color: #8b949e; font-size: 12px; text-transform: uppercase; }
+    
+    .verdict-box { background: rgba(255, 75, 75, 0.1); border: 1px solid #ff4b4b; border-radius: 12px; padding: 20px; }
+    
+    .footer { text-align: center; color: #8b949e; font-size: 14px; margin-top: 50px; padding: 20px; border-top: 1px solid #30363d; }
+    a { color: #ff4b4b !important; text-decoration: none; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- ANALYST INTELLIGENCE ENGINE ---
-def get_analyst_intel(location):
-    loc = location.lower()
-    if any(x in loc for x in ["corridor", "cybercity", "ujjain"]):
-        return {
-            "score": 94, "action": "Strong Buy", "appr": 1.27, "gain": 1.45, "yield": "3.2%",
-            "infra": 96, "comm": 92, "conn": 98, "govt": 90, "demand": 97,
-            "drivers": "₹300Cr AI Cybercity IT Park (Launched May 2026), Indore Metro Orange Line Ops, 2028 Simhastha Corridor development.",
-            "verdict": "Highest growth potential in MP. The launch of Cybercity by Micro Mitti (May 2026) marks a structural shift for high-value office demand.",
-            "news": [
-                "🚀 MAY 13, 2026: Micro Mitti launches ₹300Cr 'Cybercity' IT Park on Super Corridor; 5000 jobs expected.",
-                "🚇 MAY 09, 2026: MP Metro launches 'Celebration on Wheels'—Metro coaches now bookable for private events.",
-                "🚧 UPDATE: IDA approves Rs 1,508.88 crore budget for 2025-26 with focus on Super Corridor infrastructure."
-            ],
-            "coords": "22.7554,75.8118"
-        }
-    elif any(x in loc for x in ["bypass", "ab road", "jhalaria"]):
-        return {
-            "score": 88, "action": "Buy", "appr": 1.10, "gain": 0.95, "yield": "4.1%",
-            "infra": 89, "comm": 86, "conn": 92, "govt": 84, "demand": 91,
-            "drivers": "TPS-4 Road completion (connecting Bypass to Jhalaria), Bypass 6-lane expansion, Rising demand for gated villas.",
-            "verdict": "Best for premium residential stability. Recent IDA clearance of obstructions for TPS-4 road ensures direct connectivity to Jhalaria.",
-            "news": [
-                "🛣 MAY 14, 2026: IDA clears 20 structures to speed up TPS-4 road connecting Bypass to Jhalaria.",
-                "🏢 APR 2026: Surge in residential demand for gated villas as bypass infrastructure nears 90% completion."
-            ],
-            "coords": "22.7303,75.9221"
-        }
-    else:
-        return {
-            "score": 79, "action": "Hold", "appr": 0.82, "gain": 0.65, "yield": "4.8%",
-            "infra": 81, "comm": 83, "conn": 86, "govt": 72, "demand": 78,
-            "drivers": "Urban Renewal Schemes, MOG Lines Redevelopment, High Rental Stability in established hubs.",
-            "verdict": "Mature market performance. Solid for rental yields, but look for newer corridors for rapid capital gain.",
-            "news": ["🏛 FEB 2026: MOG Lines Redevelopment Phase 1 plots auction completed; infrastructure work begins."],
-            "coords": "22.7196,75.8577"
-        }
-
-# --- BRANDING & HEADER ---
-col_logo, col_title = st.columns([1, 4])
+# --- LOGO & HEADER ---
+col_logo, col_links = st.columns([1, 1])
 with col_logo:
-    if logo_base64:
-        st.image(f"data:image/png;base64,{logo_base64}", width=120)
-    else:
-        # Fallback to your GitHub URL
-        st.image("https://raw.githubusercontent.com/charchitrawal/sanj_logo/main/Sanj_Properties_Logo.png", width=120)
+    if logo_html:
+        st.image(logo_html, width=180)
+with col_links:
+    st.markdown("<p style='text-align: right;'><a href='https://linktr.ee/Sanj.properties'>Official Website</a> | <a href='https://www.instagram.com/sanj.property/'>Instagram</a></p>", unsafe_allow_html=True)
 
-with col_title:
-    st.markdown("<div style='color: #ff4b4b; font-weight: 800; font-size: 14px; letter-spacing: 2px; padding-top: 10px;'>SANJ PROPERTIES — WHERE VISION MEETS VELOCITY</div>", unsafe_allow_html=True)
-    st.markdown("<h1 style='margin-bottom: 40px;'>Sanj AI Analyst</h1>", unsafe_allow_html=True)
+# --- INPUTS ---
+st.markdown("<h1 style='text-align: center; margin-bottom: 30px;'>Property Price Projector</h1>", unsafe_allow_html=True)
 
-# --- INPUT SECTION ---
 with st.container():
-    c1, c2, c3 = st.columns([3, 2, 1])
-    with c1: loc_input = st.text_input("SEARCH AREA / PROJECT", value="Super Corridor")
-    with c2: price = st.number_input("CURRENT RATE (₹/sqft)", value=5500)
-    with c3:
-        st.markdown("<br>", unsafe_allow_html=True)
-        analyze = st.button("RUN SANJ AI ↗")
+    c1, c2 = st.columns(2)
+    with c1:
+        loc = st.text_input("LOCATION / AREA", placeholder="e.g. Super Corridor")
+    with c2:
+        price = st.number_input("CURRENT PRICE (₹/sqft)", min_value=500, value=5000)
 
-if analyze:
-    intel = get_analyst_intel(loc_input)
-    est_val = int(price * (1 + intel['gain']))
+if st.button("RUN AI ANALYSIS ↗"):
+    if loc:
+        # Simulated Data for V4 UI Demonstration
+        data = {
+            "locationFull": f"{loc}, Indore, MP",
+            "investmentScore": 88,
+            "metrics": {"appreciation5yr": "127%", "projectedGain": "120%", "rentalYield": "3.8%", "liquidity": "Very High"},
+            "historical": [2200, 2650, 3200, 3900, 4500, 5000],
+            "projected": [5800, 6800, 8000, 9400, 11000],
+            "years_h": [2020, 2021, 2022, 2023, 2024, 2025],
+            "years_p": [2026, 2027, 2028, 2029, 2030]
+        }
 
-    # 1. Name Display
-    st.markdown(f"<h1 style='font-size: 65px; font-weight: 900; margin-bottom: 0; color: white;'>{loc_input.upper()}</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='color:#8b949e; margin-top:-10px;
+        # --- SCORE & METRICS ---
+        st.markdown(f"<h2 style='color: #ff4b4b;'>{data['locationFull']}</h2>", unsafe_allow_html=True)
+        
+        m1, m2, m3, m4, m5 = st.columns(5)
+        m1.markdown(f"<div class='metric-card'><div class='metric-label'>Score</div><div class='metric-value'>{data['investmentScore']}</div></div>", unsafe_allow_html=True)
+        m2.markdown(f"<div class='metric-card'><div class='metric-label'>5Y Appr.</div><div class='metric-value'>{data['metrics']['appreciation5yr']}</div></div>", unsafe_allow_html=True)
+        m3.markdown(f"<div class='metric-card'><div class='metric-label'>Proj. Gain</div><div class='metric-value'>{data['metrics']['projectedGain']}</div></div>", unsafe_allow_html=True)
+        m4.markdown(f"<div class='metric-card'><div class='metric-label'>Rental</div><div class='metric-value'>{data['metrics']['rentalYield']}</div></div>", unsafe_allow_html=True)
+        m5.markdown(f"<div class='metric-card'><div class='metric-label'>Liquidity</div><div class='metric-value' style='font-size: 16px; padding-top:8px;'>{data['metrics']['liquidity']}</div></div>", unsafe_allow_html=True)
+
+        # --- CHARTS ---
+        st.write("---")
+        ch1, ch2 = st.columns(2)
+        
+        with ch1:
+            st.markdown("### 📊 Price History (5 Years)")
+            fig_h = go.Figure(go.Scatter(x=data['years_h'], y=data['historical'], mode='lines+markers', line=dict(color='#ff4b4b', width=4), fill='tozeroy'))
+            fig_h.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white", height=300, margin=dict(l=20, r=20, t=20, b=20))
+            st.plotly_chart(fig_h, use_container_width=True)
+
+        with ch2:
+            st.markdown("### 📈 Projection (Next 5 Years)")
+            fig_p = go.Figure(go.Scatter(x=data['years_p'], y=data['projected'], mode='lines+markers', line=dict(color='#00ff88', width=4), fill='tozeroy'))
+            fig_p.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)', font_color="white", height=300, margin=dict(l=20, r=20, t=20, b=20))
+            st.plotly_chart(fig_p, use_container_width=True)
+
+        # --- VERDICT ---
+        st.markdown("### 📝 Investment Verdict")
+        st.markdown(f"<div class='verdict-box'>Super Corridor is Indore's single most promising corridor. With Infosys, TCS, and IIM nearby, and the Metro Phase 2 confirmed, prices are projected to reach ₹11,000/sqft by 2030. <strong>Strong BUY recommendation.</strong></div>", unsafe_allow_html=True)
+
+        # --- FOOTER ---
+        st.markdown(f"""
+            <div class="footer">
+                <p><strong>Sanj Properties — Where Vision Meets Velocity</strong></p>
+                <p>9039914137 | 7697246823</p>
+                <a href="https://wa.me/919039914137">Chat on WhatsApp</a> | <a href="https://linktr.ee/Sanj.properties">Our Portfolio</a>
+            </div>
+        """, unsafe_allow_html=True)
+    else:
+        st.error("Please enter a location.")
