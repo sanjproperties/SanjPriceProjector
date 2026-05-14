@@ -131,15 +131,6 @@ if analyze:
     with v_right:
         st.markdown(f"<div style='background:rgba(0,255,136,0.05); border:1px solid #00ff88; padding:20px; border-radius:12px;'><h3>AI Verdict</h3><p>{intel['verdict']}</p></div>", unsafe_allow_html=True)
 
-    # 11. MAPS VIEW (Dynamic Satellite Embed)
-    st.write("---")
-    st.markdown("### 🛰 Live Satellite View")
-    components.html(f"""
-        <iframe width="100%" height="450" frameborder="0" style="border:0"
-        src="https://www.google.com/maps/embed/v1/search?key=YOUR_API_KEY_HERE&q={intel['coords']}&zoom=15&maptype=satellite" allowfullscreen>
-        </iframe>
-    """, height=500)
-
     # 12. PRICE TIMELINE TABLE
     st.markdown("### 📅 Detailed Price Timeline")
     rows = ""
@@ -156,7 +147,7 @@ st.markdown(f"""
         <p>Expert Advice: 9039914137 | 7697246823</p>
         <a href='https://wa.me/919039914137' class='whatsapp-btn'>CHAT ON WHATSAPP ↗</a>
         <p style='font-size:12px; margin-top:30px; color:#8b949e;'>
-            <a href='https://linktr.ee/Sanj.properties' style='color:#8b949e;'>Portfolio</a> | 
+            <a href='https://linktr.ee/Sanj.properties' style='color:#8b949e;'>Our Curated Portfolio</a> | 
             <a href='https://www.instagram.com/sanj.property/' style='color:#8b949e;'>Instagram</a> | 
             <a href='https://www.facebook.com/profile.id=61586657172896' style='color:#8b949e;'>Facebook</a>
         </p>
